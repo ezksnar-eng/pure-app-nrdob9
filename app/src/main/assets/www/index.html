@@ -364,7 +364,7 @@
                 <label class="lbl" for="fJdk">نسخة JDK للبناء</label>
                 <select id="fJdk"><option value="17">JDK 17 (الأشهر)</option><option value="21">JDK 21</option><option value="11">JDK 11</option></select>
             </div>
-            <div class="py-note">الموقع يبني مشروعك كما هو بدون ما يغيّر بيه شي (الاسم والأيقونة والحزمة من مشروعك). إذا مشروعك بيه <b dir="ltr">gradlew</b> ينستخدم، وإلا يستخدم Gradle 8.7.</div>
+            <div class="py-note">الموقع يبني مشروعك كما هو بدون ما يغيّر بيه شي (الاسم والأيقونة والحزمة من مشروعك). إذا مشروعك بيه <b dir="ltr">gradlew</b> ينستخدم، وإلا يستخدم Gradle 8.7.<br>حتى التحديث ينثبت فوق النسخة القديمة: الموقع يوقّع كل بناء بمفتاح ثابت ويرفع رقم الإصدار (versionCode) تلقائي.</div>
         </div>
 
         <div class="panel" id="pUrl">
@@ -393,12 +393,12 @@
         </div>
 
         <div class="sec"><span class="n">٣</span>الإعدادات</div>
-        <div class="toggle-group" data-modes="url zip code">
+        <div class="toggle-group" data-modes="url zip code python java kotlin lua">
             <div class="toggle-item">
-                <span>ملء الشاشة (إخفاء شريط الحالة)</span>
+                <span>ملء الشاشة الكامل (يخفي شريط الحالة وثقب الكاميرا ومنطقة البطارية فوق، وشريط التنقل تحت)</span>
                 <label class="switch"><input type="checkbox" id="oFull"><span class="slider"></span></label>
             </div>
-            <div class="toggle-item">
+            <div class="toggle-item" data-modes="url zip code">
                 <span>السماح بالتكبير بالإصبعين</span>
                 <label class="switch"><input type="checkbox" id="oZoom"><span class="slider"></span></label>
             </div>
@@ -416,6 +416,21 @@
             </div>
             <div class="live-hint">ابنِ APK مرة وحدة، وبعدها أي تعديل تسويه اضغط «⚡ تحديث فوري» والتطبيق يتحدث لحاله عند كل واحد فاتحه. يحتاج مستودع عام، ويشمل الكود والملفات بس (مو الإعدادات والمكتبات).</div>
         </div>
+
+        <div class="sec" data-modes="zip code" id="secSiteHead" style="cursor:pointer" role="button" tabindex="0"><span class="n">🌐</span>موقع يطلع بالبحث (اختياري)<button type="button" id="secSiteToggle" style="border:none;background:none;color:var(--magenta);font-weight:900;font-size:1rem;cursor:pointer;flex:0 0 auto">▾</button></div>
+        <div class="toggle-group" data-modes="zip code" id="secSiteBody">
+            <div class="field" style="margin-bottom:10px">
+                <label class="lbl" for="fSeoTitle">عنوان الموقع (لجوجل)</label>
+                <input type="text" id="fSeoTitle" maxlength="70" placeholder="مثال: بيور مانجا — اقرأ مجاناً" autocomplete="off">
+            </div>
+            <div class="field" style="margin-bottom:0">
+                <label class="lbl" for="fSeoDesc">وصف الموقع (يبين تحت العنوان بنتائج البحث)</label>
+                <textarea id="fSeoDesc" class="small" maxlength="160" placeholder="وصف قصير يشرح الموقع بجملة أو جملتين"></textarea>
+            </div>
+            <div class="live-hint">ينشر نفس محتوى ZIP/الكود كموقع حقيقي بمستودع عام منفصل على GitHub Pages، برابط دائم تگدر تشاركه أو تسويله فهرسة بگوگل. غير مرتبط ببناء الـ APK.</div>
+            <button class="btn-ghost" type="button" id="publishSiteBtn">🌐 نشر / تحديث الموقع</button>
+            <div id="siteInfo" style="display:none;margin-top:8px"></div>
+        </div>
         <div class="toggle-group">
             <div class="toggle-item" data-modes="url zip code python java kotlin lua">
                 <span>قفل الاتجاه عمودي فقط</span>
@@ -425,6 +440,13 @@
                 <span>مستودع خاص على GitHub (ينطبق عند أول بناء)</span>
                 <label class="switch"><input type="checkbox" id="oPrivate"><span class="slider"></span></label>
             </div>
+        </div>
+        <div class="toggle-group" data-modes="url zip code python java kotlin lua android">
+            <div class="toggle-item">
+                <span>🎯 جهّز نسخة لنشرها على Google Play (AAB)</span>
+                <label class="switch"><input type="checkbox" id="oPlay"><span class="slider"></span></label>
+            </div>
+            <div class="live-hint">يبني ملف AAB إضافي موقّع بمفتاح دائم يتولد أول مرة ويبقى نفسه بكل تحديث (شرط لنشر بگوگل بلي). يفعّل «مستودع خاص» تلقائي ويطفّي «تعديل فوري» — لأن مفتاح النشر لازم يبقى سري. باقي خطوات النشر (حساب المطوّر، معلومات المتجر) يدوية بالكونسول، موجودة بملف README-PLAY-AR.txt داخل المشروع.</div>
         </div>
 
         <div class="row3" data-modes="url zip code python java kotlin lua">
@@ -1157,6 +1179,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -1176,6 +1199,7 @@ public class MainActivity extends Activity implements Host.Listener {
     private static final String STATUS_COLOR = "__COLOR__";
     private static final int WEB_PORT = __PORT__;
     private static final boolean BG = __BG__;
+    private static final boolean FULLSCREEN = __FULLSCREEN__;
 
     private FrameLayout frame;
     private LinearLayout consoleView;
@@ -1189,10 +1213,7 @@ public class MainActivity extends Activity implements Host.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            getWindow().setStatusBarColor(Color.parseColor(STATUS_COLOR));
-        } catch (Exception ignored) {
-        }
+        applyWindow();
         buildUi();
         if (BG) {
             if (Build.VERSION.SDK_INT >= 33) {
@@ -1209,6 +1230,36 @@ public class MainActivity extends Activity implements Host.Listener {
         Host.attach(this);
         if (WEB_PORT > 0) {
             watchPort();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void applyWindow() {
+        try {
+            getWindow().setStatusBarColor(Color.parseColor(STATUS_COLOR));
+        } catch (Exception ignored) {
+        }
+        if (FULLSCREEN) {
+            enterImmersive();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void enterImmersive() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && FULLSCREEN) {
+            enterImmersive();
         }
     }
 
@@ -2132,7 +2183,39 @@ const README_AR = [
     ''
 ].join('\n');
 
-/* يحل مشكلة تعارض kotlin-stdlib-jdk7/jdk8 مع kotlin-stdlib (Duplicate class) */
+function README_PLAY_AR(app) {
+    return [
+        'خطوات نشر تطبيقك على Google Play',
+        '=====================================',
+        '',
+        'هذا المستودع يحتوي أيضاً على app-release.aab — ملف مبني ومو قّع خصيصاً لهذا التطبيق',
+        'بمفتاح دائم اسمه play-release.keystore، انولّد أول مرة تسوي بناء وينحفظ داخل هذا',
+        'المستودع (خاص) حتى يبقى نفسه بكل تحديث — لازم يبقى نفس المفتاح دايماً وإلا Google Play',
+        'يرفض أي تحديث بعد أول رفعة.',
+        '',
+        '⚠️ مهم جداً: خلي هذا المستودع خاص للأبد ولا تسويه عام أو تشاركه، لأن مفتاح التوقيع',
+        'محفوظ بالملفين play-release.keystore و play-release-key.properties. أي شخص يشوفهم',
+        'يكدر ينتحل تطبيقك بتحديثات مزيفة. إذا صار خاص → عام بالغلط، سوّي مفتاح جديد فوراً.',
+        '',
+        'الخطوات المتبقية (يدوية، مو من الموقع):',
+        '  1) سوّي حساب مطوّر بگوگل بلي (رسم اشتراك مرة وحدة ~25 دولار): https://play.google.com/console/signup',
+        '  2) أنشئ تطبيق جديد بالكونسول، بنفس معرّف الحزمة: ' + app.pkg,
+        '  3) بالقسم Release > Testing > Internal testing، ارفع ملف app-release.aab.',
+        '  4) عبّي "معلومات المتجر": الاسم، الوصف، صور الشاشة، أيقونة، سياسة الخصوصية (لازم رابط حقيقي).',
+        '  5) عبّي استبيان تصنيف المحتوى (Content rating) واستهداف الجمهور.',
+        '  6) أرسل نسخة الاختبار الداخلي أول، جربها، وبعدين قدّم للمراجعة (Production).',
+        '  7) المراجعة تاخذ من ساعات إلى أيام حسب گوگل.',
+        '',
+        'ملاحظة عن "التطبيق محظور/غير معروف": هذا التحذير يطلع بس للتطبيقات المثبتة يدوياً',
+        '(APK) خارج المتجر. أول ما تصير تنزّل تطبيقك من Google Play، المستخدمين اللي يحملونه',
+        'من هناك ما يشوفون هذا التحذير أبداً — هذا الحل الوحيد الحقيقي إله.',
+        ''
+    ].join('\n');
+}
+
+/* سكربت Gradle يُحقن بكل المشاريع:
+   1) يحل تعارض kotlin-stdlib-jdk7/jdk8 مع kotlin-stdlib (Duplicate class)
+   2) لمشاريع الأندرويد الجاهزة: توقيع ثابت + versionCode يزيد كل بناء، حتى التحديث ينثبت فوق النسخة القديمة */
 const INIT_GRADLE = [
     'allprojects {',
     '    configurations.all {',
@@ -2141,6 +2224,38 @@ const INIT_GRADLE = [
     "            if (r.group == 'org.jetbrains.kotlin' && (r.name == 'kotlin-stdlib-jdk7' || r.name == 'kotlin-stdlib-jdk8') && r.version != null) {",
     '                details.useTarget("org.jetbrains.kotlin:kotlin-stdlib:${r.version}")',
     "                details.because('merged into kotlin-stdlib since Kotlin 1.8')",
+    '            }',
+    '        }',
+    '    }',
+    '    afterEvaluate { p ->',
+    "        def androidExt = p.extensions.findByName('android')",
+    "        if (androidExt != null && p.plugins.hasPlugin('com.android.application')) {",
+    "            def ks = new File(p.rootProject.projectDir, 'pure-debug.keystore')",
+    '            if (ks.exists()) {',
+    "                def cfg = androidExt.signingConfigs.maybeCreate('debug')",
+    '                cfg.storeFile = ks',
+    "                cfg.storePassword = 'android'",
+    "                cfg.keyAlias = 'androiddebugkey'",
+    "                cfg.keyPassword = 'android'",
+    '            }',
+    "            def vc = System.getenv('PURE_VERSION_CODE')",
+    '            if (vc != null && vc.isInteger()) {',
+    '                androidExt.defaultConfig.versionCode = vc.toInteger()',
+    '            }',
+    "            def playKs = new File(p.rootProject.projectDir, 'play-release.keystore')",
+    "            def playProps = new File(p.rootProject.projectDir, 'play-release-key.properties')",
+    '            if (playKs.exists() && playProps.exists()) {',
+    '                def props = new Properties()',
+    '                playProps.withInputStream { props.load(it) }',
+    "                def rcfg = androidExt.signingConfigs.maybeCreate('release')",
+    '                rcfg.storeFile = playKs',
+    "                rcfg.storePassword = props.getProperty('storePassword')",
+    "                rcfg.keyAlias = props.getProperty('keyAlias')",
+    "                rcfg.keyPassword = props.getProperty('keyPassword')",
+    "                def rel = androidExt.buildTypes.findByName('release')",
+    '                if (rel != null) {',
+    '                    rel.signingConfig = rcfg',
+    '                }',
     '            }',
     '        }',
     '    }',
@@ -2180,39 +2295,71 @@ function workflowYaml(o) {
             '          python-version: "3.11"'
         );
     }
+    if (o.androidProject) {
+        lines.push(
+            '      - name: Version code',
+            '        run: echo "PURE_VERSION_CODE=$(date +%s)" >> "$GITHUB_ENV"'
+        );
+    }
     if (o.wrapper) {
         lines.push('      - name: Setup Gradle', '        uses: gradle/actions/setup-gradle@v4');
     } else {
         lines.push('      - name: Setup Gradle', '        uses: gradle/actions/setup-gradle@v4', '        with:', '          gradle-version: "8.7"');
     }
+    const gradleCmd = "if [ -f gradlew ]; then chmod +x gradlew; GRADLE='./gradlew'; else GRADLE='gradle'; fi";
     lines.push(
         '      - name: Build APK',
         '        run: |',
-        '          if [ -f gradlew ]; then',
-        '            chmod +x gradlew',
-        '            ./gradlew -I pure-init.gradle assembleDebug --no-daemon --console=plain',
-        '          else',
-        '            gradle -I pure-init.gradle assembleDebug --no-daemon --console=plain',
-        '          fi',
+        '          ' + gradleCmd,
+        '          $GRADLE -I pure-init.gradle assembleDebug --no-daemon --console=plain',
         '      - name: Collect APK',
         '        run: |',
         '          apk=$(find . -path "*/build/outputs/apk/debug/*.apk" | head -n 1)',
         '          test -n "$apk" || { echo "APK not found"; exit 1; }',
-        '          cp "$apk" app.apk',
+        '          cp "$apk" app.apk'
+    );
+    if (o.playBuild) {
+        lines.push(
+            '      - name: Persistent Play upload key',
+            '        run: |',
+            '          if [ ! -f play-release.keystore ]; then',
+            '            PW=$(openssl rand -hex 16)',
+            '            keytool -genkeypair -v -keystore play-release.keystore -storetype PKCS12 -alias playupload \\\\',
+            '              -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PW" -keypass "$PW" \\\\',
+            '              -dname "CN=Pure App,O=Pure Team,C=IQ"',
+            '            { echo "storePassword=$PW"; echo "keyPassword=$PW"; echo "keyAlias=playupload"; } > play-release-key.properties',
+            '            git config user.email "actions@github.com"',
+            '            git config user.name "github-actions"',
+            '            git add play-release.keystore play-release-key.properties',
+            '            git commit -m "Add persistent Play upload key [skip ci]"',
+            '            git push',
+            '          fi',
+            '      - name: Build AAB (Google Play)',
+            '        run: $GRADLE -I pure-init.gradle bundleRelease --no-daemon --console=plain',
+            '      - name: Collect AAB',
+            '        run: |',
+            '          aab=$(find . -path "*/build/outputs/bundle/release/*.aab" | head -n 1)',
+            '          test -n "$aab" || { echo "AAB not found"; exit 1; }',
+            '          cp "$aab" app-release.aab'
+        );
+    }
+    lines.push(
         '      - name: Upload artifact',
         '        uses: actions/upload-artifact@v4',
         '        with:',
         '          name: app-apk',
-        '          path: app.apk',
+        '          path: |',
+        '            app.apk',
+        o.playBuild ? '            app-release.aab' : null,
         '      - name: Publish release',
         '        env:',
         '          GH_TOKEN: ${{ github.token }}',
         '        run: |',
         '          gh release delete latest --yes --cleanup-tag || true',
-        '          gh release create latest app.apk --target "$GITHUB_SHA" --title "APK" --notes "Built with Pure App Builder"',
+        '          gh release create latest app.apk' + (o.playBuild ? ' app-release.aab' : '') + ' --target "$GITHUB_SHA" --title "APK" --notes "Built with Pure App Builder"',
         ''
     );
-    return lines.join('\n');
+    return lines.filter(l => l !== null).join('\n');
 }
 
 /* ---------------------------------------------------------------
@@ -2265,6 +2412,47 @@ async function liveFiles(app, version) {
 }
 
 /* ---------------------------------------------------------------
+   نشر موقع بحث (GitHub Pages) — عنوان/وصف SEO + robots + sitemap
+---------------------------------------------------------------- */
+function injectSeo(html, seo, pageUrl) {
+    const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const title = esc(seo.title);
+    const desc = esc(seo.desc);
+    const tags = [
+        seo.title ? '<title>' + title + '</title>' : '',
+        seo.desc ? '<meta name="description" content="' + desc + '">' : '',
+        '<link rel="canonical" href="' + esc(pageUrl) + '">',
+        seo.title ? '<meta property="og:title" content="' + title + '">' : '',
+        seo.desc ? '<meta property="og:description" content="' + desc + '">' : '',
+        '<meta property="og:type" content="website">',
+        '<meta property="og:url" content="' + esc(pageUrl) + '">',
+        '<meta name="robots" content="index, follow">'
+    ].filter(Boolean).join('\n    ');
+    if (!tags) return html;
+    if (/<title>[\s\S]*?<\/title>/i.test(html) && seo.title) html = html.replace(/<title>[\s\S]*?<\/title>/i, '');
+    if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, m => m + '\n    ' + tags);
+    return '<head>\n    ' + tags + '\n</head>\n' + html;
+}
+
+function siteFiles(app, siteUrl) {
+    const files = contentFiles(app).map(f => ({ path: f.path, data: f.data }));
+    const entry = contentEntry(app);
+    const seo = { title: (app.seoTitle || app.name || '').trim(), desc: (app.seoDesc || '').trim() };
+    const idx = files.findIndex(f => f.path === entry);
+    if (idx >= 0 && (seo.title || seo.desc)) {
+        const html = injectSeo(dec.decode(files[idx].data), seo, siteUrl);
+        files[idx] = { path: entry, data: enc.encode(html) };
+    }
+    files.push({ path: 'robots.txt', data: enc.encode('User-agent: *\nAllow: /\nSitemap: ' + siteUrl + 'sitemap.xml\n') });
+    files.push({ path: 'sitemap.xml', data: enc.encode('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' + siteUrl + '</loc></url></urlset>\n') });
+    if (entry !== 'index.html' && !files.some(f => f.path === 'index.html')) {
+        files.push({ path: 'index.html', data: enc.encode('<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=./' + encodeURI(entry) + '">') });
+    }
+    return files;
+}
+function siteRepoName(app) { return 'pure-site-' + slugOf(app.name, 'site') + '-' + app.id; }
+
+/* ---------------------------------------------------------------
    مشروع الأندرويد — الملفات النصية
 ---------------------------------------------------------------- */
 function buildTextFiles(app, opts) {
@@ -2290,7 +2478,8 @@ function buildTextFiles(app, opts) {
             ENTRY: javaStr(entry),
             PORT: String(mode === 'python' && app.pyRun === 'web' ? (app.pyPort || 8080) : 0),
             BG: String(bg),
-            USES_FILES: String(LANGS[mode].usesFiles)
+            USES_FILES: String(LANGS[mode].usesFiles),
+            FULLSCREEN: String(!!app.fullscreen)
         });
         files.push(
             T(jp + 'MainActivity.java', renderTpl('console', map)),
@@ -2421,11 +2610,15 @@ function buildTextFiles(app, opts) {
         T('app/src/main/AndroidManifest.xml', manifest),
         T('app/src/main/res/values/strings.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<resources>', '    <string name="app_name" formatted="false">' + androidStr(app.name) + '</string>', '</resources>', ''].join('\n')),
         T('app/src/main/res/values/styles.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<resources>', '    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">', '        <item name="android:windowBackground">@android:color/white</item>', '    </style>', '</resources>', ''].join('\n')),
-        T('.github/workflows/build-apk.yml', workflowYaml({ python: mode === 'python' })),
+        T('app/src/main/res/values-v28/styles.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<resources>', '    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">', '        <item name="android:windowBackground">@android:color/white</item>', '        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>', '    </style>', '</resources>', ''].join('\n')),
+        T('app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">', '    <background android:drawable="@drawable/ic_launcher_background" />', '    <foreground android:drawable="@mipmap/ic_launcher_fg" />', '</adaptive-icon>', ''].join('\n')),
+        T('app/src/main/res/drawable/ic_launcher_background.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">', '    <solid android:color="' + color + '" />', '</shape>', ''].join('\n')),
+        T('.github/workflows/build-apk.yml', workflowYaml({ python: mode === 'python', playBuild: !!app.playBuild })),
         T('pure-init.gradle', INIT_GRADLE),
-        T('README-AR.txt', README_AR),
-        { path: 'app/debug.keystore', data: b64ToU8(KEYSTORE_B64) }
+        T('README-AR.txt', README_AR)
     );
+    if (app.playBuild) files.push(T('README-PLAY-AR.txt', README_PLAY_AR(app)));
+    files.push({ path: 'app/debug.keystore', data: b64ToU8(KEYSTORE_B64) });
     return files;
 }
 
@@ -2434,7 +2627,9 @@ function androidFiles(app) {
     const files = (app.srcFiles || []).filter(f => !/^\.github\/workflows\//.test(f.path)).map(f => ({ path: f.path, data: f.data }));
     const wrapper = files.some(f => f.path === 'gradlew');
     files.push({ path: 'pure-init.gradle', data: enc.encode(INIT_GRADLE) });
-    files.push({ path: '.github/workflows/build-apk.yml', data: enc.encode(workflowYaml({ wrapper, jdk: app.jdk || '17' })) });
+    files.push({ path: 'pure-debug.keystore', data: b64ToU8(KEYSTORE_B64) });
+    if (app.playBuild) files.push({ path: 'README-PLAY-AR.txt', data: enc.encode(README_PLAY_AR(app)) });
+    files.push({ path: '.github/workflows/build-apk.yml', data: enc.encode(workflowYaml({ wrapper, jdk: app.jdk || '17', androidProject: true, playBuild: !!app.playBuild })) });
     return files;
 }
 /* ---------------------------------------------------------------
@@ -2457,6 +2652,7 @@ function makeGH(token) {
         try {
             res = await fetch('https://api.github.com' + path, {
                 method,
+                cache: 'no-store',
                 headers: Object.assign(
                     { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' },
                     opts.body ? { 'Content-Type': 'application/json' } : {}
@@ -2531,6 +2727,7 @@ async function fetchFailureLog(token, owner, name, runId, gh) {
         const job = jobs.find(j => j.conclusion === 'failure') || jobs[0];
         if (!job) return '';
         const res = await fetch('https://api.github.com/repos/' + owner + '/' + name + '/actions/jobs/' + job.id + '/logs', {
+            cache: 'no-store',
             headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
         });
         if (!res.ok) return '';
@@ -2540,13 +2737,16 @@ async function fetchFailureLog(token, owner, name, runId, gh) {
 
 async function finishRun(gh, owner, name, run, isPrivate, token) {
     const base = 'https://github.com/' + owner + '/' + name;
-    const out = { owner, repo: name, runId: run.id, runUrl: run.html_url || (base + '/actions/runs/' + run.id), isPrivate: !!isPrivate, success: run.conclusion === 'success', apkUrl: '', releaseUrl: base + '/releases/tag/latest', failedStep: '', errorText: '' };
+    const out = { owner, repo: name, runId: run.id, runUrl: run.html_url || (base + '/actions/runs/' + run.id), isPrivate: !!isPrivate, success: run.conclusion === 'success', apkUrl: '', assetId: 0, aabUrl: '', aabAssetId: 0, releaseUrl: base + '/releases/tag/latest', failedStep: '', errorText: '' };
     if (out.success) {
         out.apkUrl = base + '/releases/download/latest/app.apk';
         try {
             const rel = (await gh.api('/repos/' + owner + '/' + name + '/releases/tags/latest')).data;
             const asset = (rel.assets || []).find(a => a.name === 'app.apk');
             if (asset && asset.browser_download_url) out.apkUrl = asset.browser_download_url;
+            if (asset && asset.id) out.assetId = asset.id;
+            const aab = (rel.assets || []).find(a => a.name === 'app-release.aab');
+            if (aab && aab.id) { out.aabAssetId = aab.id; out.aabUrl = aab.browser_download_url || ''; }
         } catch (e) { /* نستخدم الرابط الافتراضي */ }
     } else {
         try {
@@ -2684,23 +2884,89 @@ async function githubLivePush(ctx) {
     const repo = (await gh.api('/repos/' + me + '/' + name)).data;
     if (repo.private) throw new Error('التعديل الفوري يحتاج مستودع عام');
     const branch = repo.default_branch || 'main';
-    const head = (await gh.api('/repos/' + me + '/' + name + '/git/ref/heads/' + branch)).data.object.sha;
-    const baseTree = (await gh.api('/repos/' + me + '/' + name + '/git/commits/' + head)).data.tree.sha;
-    const entries = [];
+
+    const blobEntries = [];
     for (const f of files) {
-        if (f.path.endsWith('.json')) entries.push({ path: f.path, mode: '100644', type: 'blob', content: dec.decode(f.data) });
+        if (f.path.endsWith('.json')) blobEntries.push({ path: f.path, mode: '100644', type: 'blob', content: dec.decode(f.data) });
         else {
             const b = (await gh.api('/repos/' + me + '/' + name + '/git/blobs', { method: 'POST', body: { content: u8ToB64(f.data), encoding: 'base64' } })).data;
+            blobEntries.push({ path: f.path, mode: '100644', type: 'blob', sha: b.sha });
+        }
+    }
+    let lastErr = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            const head = (await gh.api('/repos/' + me + '/' + name + '/git/ref/heads/' + branch)).data.object.sha;
+            const baseTree = (await gh.api('/repos/' + me + '/' + name + '/git/commits/' + head)).data.tree.sha;
+            const tree = (await gh.api('/repos/' + me + '/' + name + '/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: blobEntries } })).data;
+            const commit = (await gh.api('/repos/' + me + '/' + name + '/git/commits', {
+                method: 'POST', body: { message: 'Live update: ' + app.name, tree: tree.sha, parents: [head] }
+            })).data;
+            await gh.api('/repos/' + me + '/' + name + '/git/refs/heads/' + branch, { method: 'PATCH', body: { sha: commit.sha } });
+            if (log) log('✔ تم رفع التحديث الفوري');
+            return { owner: me, name, sha: commit.sha };
+        } catch (e) {
+            lastErr = e;
+            if (!/fast forward|fast-forward/i.test(e.message || '')) throw e;
+            await sleep(ctx.retryMs === undefined ? 1500 : ctx.retryMs);
+        }
+    }
+    throw new Error('تعارض مع تحديث ثاني على المستودع، أعد المحاولة بعد ثواني');
+}
+
+/* نشر موقع بحث على GitHub Pages — مستودع عام مخصص، مع robots/sitemap وميتا SEO */
+async function githubPublishSite(ctx) {
+    const { token, app, log } = ctx;
+    const gh = makeGH(token);
+    const me = (await gh.api('/user')).data.login;
+    const repoName = (app.site && app.site.owner === me && app.site.name) ? app.site.name : siteRepoName(app);
+    const siteUrl = 'https://' + me + '.github.io/' + repoName + '/';
+
+    let repo;
+    try {
+        repo = (await gh.api('/repos/' + me + '/' + repoName)).data;
+        if (log) log('نستخدم مستودع الموقع: ' + me + '/' + repoName);
+    } catch (e) {
+        if (e.status !== 404) throw e;
+        if (log) log('ننشئ مستودع موقع جديد (عام): ' + repoName);
+        repo = (await gh.api('/user/repos', { method: 'POST', body: { name: repoName, private: false, auto_init: true, description: 'Website published with Pure App Builder' } })).data;
+    }
+    const branch = repo.default_branch || 'main';
+
+    let head = null;
+    for (let i = 0; i < 10 && !head; i++) {
+        try {
+            head = (await gh.api('/repos/' + me + '/' + repoName + '/git/ref/heads/' + branch)).data.object.sha;
+        } catch (e) {
+            if (e.status !== 404 && e.status !== 409) throw e;
+            await sleep(ctx.refWaitMs === undefined ? 1500 : ctx.refWaitMs);
+        }
+    }
+    if (!head) throw new Error('المستودع لسه ما جهز، جرب مرة ثانية بعد ثواني');
+
+    const files = siteFiles(app, siteUrl);
+    if (log) log('رفع ' + files.length + ' ملف للموقع...');
+    const entries = [];
+    for (const f of files) {
+        const txt = /\.(html?|css|js|json|xml|txt|svg)$/i.test(f.path) ? asText(f.data) : null;
+        if (txt !== null) entries.push({ path: f.path, mode: '100644', type: 'blob', content: txt });
+        else {
+            const b = (await gh.api('/repos/' + me + '/' + repoName + '/git/blobs', { method: 'POST', body: { content: u8ToB64(f.data), encoding: 'base64' } })).data;
             entries.push({ path: f.path, mode: '100644', type: 'blob', sha: b.sha });
         }
     }
-    const tree = (await gh.api('/repos/' + me + '/' + name + '/git/trees', { method: 'POST', body: { base_tree: baseTree, tree: entries } })).data;
-    const commit = (await gh.api('/repos/' + me + '/' + name + '/git/commits', {
-        method: 'POST', body: { message: 'Live update: ' + app.name, tree: tree.sha, parents: [head] }
-    })).data;
-    await gh.api('/repos/' + me + '/' + name + '/git/refs/heads/' + branch, { method: 'PATCH', body: { sha: commit.sha } });
-    if (log) log('✔ تم رفع التحديث الفوري');
-    return { owner: me, name, sha: commit.sha };
+    const tree = (await gh.api('/repos/' + me + '/' + repoName + '/git/trees', { method: 'POST', body: { tree: entries } })).data;
+    const commit = (await gh.api('/repos/' + me + '/' + repoName + '/git/commits', { method: 'POST', body: { message: 'Publish: ' + (app.name || 'site'), tree: tree.sha, parents: [head] } })).data;
+    await gh.api('/repos/' + me + '/' + repoName + '/git/refs/heads/' + branch, { method: 'PATCH', body: { sha: commit.sha, force: true } });
+    if (log) log('✔ تم رفع ملفات الموقع');
+
+    try {
+        await gh.api('/repos/' + me + '/' + repoName + '/pages', { method: 'POST', body: { build_type: 'legacy', source: { branch, path: '/' } } });
+        if (log) log('تم تفعيل GitHub Pages');
+    } catch (e) {
+        if (e.status !== 409) throw e; /* مفعّل مسبقاً */
+    }
+    return { owner: me, repo: repoName, url: siteUrl };
 }
 
 async function resumeRun(token, info, cb) {
@@ -2762,6 +3028,48 @@ async function copyText(t) {
         return ok;
     } catch (e) { return false; }
 }
+function apkFileName(app) {
+    let n = (app.name || 'تطبيق').trim();
+    n = n.replace(/[\\/:*?"<>|\x00-\x1f]/g, '-').replace(/\s+/g, ' ').trim();
+    if (n.length > 80) n = n.slice(0, 80).trim();
+    return (n || 'تطبيق') + '.apk';
+}
+
+/* تنزيل ملف بناء (APK أو AAB) داخل نفس الصفحة بدون فتح GitHub، وباسم التطبيق */
+async function downloadBuildAsset(app, kind, btn) {
+    const lb = app.lastBuild || {};
+    const isAab = kind === 'aab';
+    const url = isAab ? lb.aabUrl : lb.apkUrl;
+    const assetId = isAab ? lb.aabAssetId : lb.assetId;
+    if (!url) return;
+    const name = apkFileName(app).replace(/\.apk$/, isAab ? '.aab' : '.apk');
+    const prevText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري التنزيل...'; }
+    try {
+        let blob;
+        if (assetId && lb.owner && lb.repo) {
+            const res = await fetch('https://api.github.com/repos/' + lb.owner + '/' + lb.repo + '/releases/assets/' + assetId, {
+                headers: { 'Authorization': 'Bearer ' + getToken(), 'Accept': 'application/octet-stream' }
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            blob = await res.blob();
+        } else {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            blob = await res.blob();
+        }
+        download(blob, name);
+        toast('بدأ تنزيل ' + name + ' 📦 — إذا انحفظ باسم "download" بدون امتداد، غيّر اسمه وضيف ' + (isAab ? '.aab' : '.apk') + ' بآخره قبل ما تستخدمه', 5000);
+    } catch (e) {
+        toast('تعذر التنزيل داخل الصفحة، رح افتحه برابط مباشر', 3500);
+        window.open(lb.isPrivate ? lb.releaseUrl : url, '_blank', 'noopener');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = prevText; }
+    }
+}
+function downloadApk(app, btn) { return downloadBuildAsset(app, 'apk', btn); }
+function downloadAab(app, btn) { return downloadBuildAsset(app, 'aab', btn); }
+
 function normUrl(v) {
     v = (v || '').trim();
     if (!v) return '';
@@ -2826,7 +3134,7 @@ const DB = (() => {
 /* ---------------------------------------------------------------
    الحالة والنماذج
 ---------------------------------------------------------------- */
-const S = { apps: [], draft: null, dirty: false, building: false, buildId: null, pendingBuild: null, pushing: false, filter: '', lastErr: '', lastLink: '' };
+const S = { apps: [], draft: null, dirty: false, building: false, buildId: null, pendingBuild: null, pendingSite: null, pushing: false, filter: '', lastErr: '', lastLink: '' };
 
 function newApp() {
     const id = uid();
@@ -2834,7 +3142,8 @@ function newApp() {
         id, name: '', pkg: 'com.pure.app' + id, mode: 'python', icon: '',
         url: '', code: '', files: null, zipName: '', entry: 'index.html',
         srcCode: '', srcFiles: null, srcZipName: '', srcEntry: '', srcLibs: '',
-        pyRun: 'console', pyPort: 8080, bg: false, live: false, liveBuilt: false, liveVersion: 0, jdk: '17',
+        pyRun: 'console', pyPort: 8080, bg: false, live: false, liveBuilt: false, liveVersion: 0, jdk: '17', playBuild: false,
+        seoTitle: '', seoDesc: '', site: null,
         fullscreen: false, portrait: false, zoom: false, privateRepo: false,
         versionName: '1.0.0', versionCode: 1, color: '#c81466',
         repo: null, lastBuild: null, createdAt: Date.now(), updatedAt: Date.now()
@@ -2850,7 +3159,7 @@ function migrate(a) {
         ['pyCode', 'pyFiles', 'pyZipName', 'pyEntry', 'pyReqs'].forEach(k => { delete a[k]; });
     }
     const d = newApp();
-    ['srcCode', 'srcFiles', 'srcZipName', 'srcEntry', 'srcLibs', 'pyRun', 'pyPort', 'bg', 'live', 'liveBuilt', 'liveVersion', 'jdk'].forEach(k => { if (a[k] === undefined) a[k] = d[k]; });
+    ['srcCode', 'srcFiles', 'srcZipName', 'srcEntry', 'srcLibs', 'pyRun', 'pyPort', 'bg', 'live', 'liveBuilt', 'liveVersion', 'jdk', 'playBuild', 'seoTitle', 'seoDesc', 'site'].forEach(k => { if (a[k] === undefined) a[k] = d[k]; });
     return a;
 }
 
@@ -2935,10 +3244,9 @@ function appCard(a) {
     if (a.live && a.liveBuilt) actions += '<button class="mini primary" data-act="live" data-id="' + a.id + '">⚡ تحديث فوري</button>';
     if (lb.state === 'building' && lb.runId) actions += '<button class="mini" data-act="resume" data-id="' + a.id + '">🔄 متابعة البناء</button>';
     if (lb.state === 'success' && lb.apkUrl) {
-        actions += lb.isPrivate
-            ? '<a class="mini primary" href="' + esc(lb.releaseUrl) + '" target="_blank" rel="noopener">⬇ صفحة التنزيل</a>'
-            : '<a class="mini primary" href="' + esc(lb.apkUrl) + '" target="_blank" rel="noopener">⬇ تنزيل APK</a>' +
-              '<button class="mini" data-act="copylink" data-id="' + a.id + '">🔗 نسخ الرابط</button>';
+        actions += '<button class="mini primary" data-act="dl" data-id="' + a.id + '">⬇ تنزيل APK</button>';
+        if (lb.aabUrl) actions += '<button class="mini primary" data-act="dl-aab" data-id="' + a.id + '">🎯 تنزيل AAB</button>';
+        if (!lb.isPrivate) actions += '<button class="mini" data-act="copylink" data-id="' + a.id + '">🔗 نسخ الرابط</button>';
     }
     actions += '<button class="mini" data-act="dup" data-id="' + a.id + '">📋 نسخة</button>' +
         '<button class="mini danger" data-act="del" data-id="' + a.id + '">🗑</button>';
@@ -3005,6 +3313,7 @@ $('ghSave').onclick = async () => {
         toast('تم الربط ✅ @' + v.login);
         setTimeout(closeGhModal, 900);
         if (S.pendingBuild) { const id = S.pendingBuild; S.pendingBuild = null; setTimeout(() => runBuild(id), 1000); }
+        if (S.pendingSite) { const id = S.pendingSite; S.pendingSite = null; setTimeout(() => publishSite(id), 1000); }
     } catch (e) {
         ghMsg('❌ ' + (e.message || 'فشل التحقق من التوكن'), 'bad');
     } finally { btn.disabled = false; }
@@ -3028,6 +3337,8 @@ $('appList').addEventListener('click', async e => {
     const app = S.apps.find(a => a.id === id);
     if (!app) return;
     const act = b.dataset.act;
+    if (act === 'dl') return downloadApk(app, b);
+    if (act === 'dl-aab') return downloadAab(app, b);
     if (act === 'edit') openEditor(app);
     else if (act === 'build') runBuild(id);
     else if (act === 'resume') resumeBuild(id);
@@ -3109,6 +3420,20 @@ function renderZipStats() {
         $('zipText').textContent = 'اضغط أو اسحب ملف ZIP هنا';
     }
 }
+function renderSiteInfo() {
+    const d = S.draft;
+    const box = $('siteInfo');
+    if (d.site && d.site.url) {
+        box.style.display = '';
+        box.innerHTML = '🌐 منشور على: <a href="' + esc(d.site.url) + '" target="_blank" rel="noopener">' + esc(d.site.url) + '</a>' +
+            '<button type="button" class="rm-link" id="siteCopyBtn" style="display:inline;margin-inline-start:8px">🔗 نسخ</button>';
+        const btn = $('siteCopyBtn');
+        if (btn) btn.onclick = async () => toast((await copyText(d.site.url)) ? 'اننسخ الرابط 🔗' : 'تعذر النسخ');
+    } else {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+}
 function renderSrc() {
     const d = S.draft;
     const has = !!(d.srcFiles && d.srcFiles.length);
@@ -3149,15 +3474,19 @@ function fillForm(d) {
     $('oLive').checked = !!d.live;
     $('oPortrait').checked = !!d.portrait;
     $('oPrivate').checked = !!d.privateRepo;
+    $('oPlay').checked = !!d.playBuild;
     $('fVer').value = d.versionName;
     $('fCodeNum').value = d.versionCode;
     $('fColor').value = d.color;
     $('fJdk').value = d.jdk || '17';
+    $('fSeoTitle').value = d.seoTitle || '';
+    $('fSeoDesc').value = d.seoDesc || '';
     document.querySelectorAll('#viewEdit .invalid').forEach(x => x.classList.remove('invalid'));
     setPyRun(d.pyRun || 'console');
     setMode(d.mode);
     renderIcon();
     renderZipStats();
+    renderSiteInfo();
 }
 
 function readForm() {
@@ -3176,10 +3505,13 @@ function readForm() {
     d.live = $('oLive').checked;
     d.portrait = $('oPortrait').checked;
     d.privateRepo = $('oPrivate').checked;
+    d.playBuild = $('oPlay').checked;
     d.versionName = $('fVer').value.trim();
     d.versionCode = parseInt($('fCodeNum').value, 10);
     d.color = $('fColor').value || '#c81466';
     d.jdk = $('fJdk').value || '17';
+    d.seoTitle = $('fSeoTitle').value.trim();
+    d.seoDesc = $('fSeoDesc').value.trim();
     return d;
 }
 
@@ -3202,6 +3534,8 @@ function validateDraft(d, strict) {
     if (!strict) return null;
     const m = d.mode;
     if (d.live && d.privateRepo && LIVE_MODES.indexOf(m) >= 0) return ['oPrivate', 'التعديل الفوري يحتاج مستودع عام. طفّي «مستودع خاص» أو «تعديل فوري»'];
+    if (d.playBuild && !d.privateRepo) return ['oPrivate', 'نسخة Google Play لازم تبقى بمستودع خاص (مفتاح النشر سري). فعّل «مستودع خاص»'];
+    if (d.playBuild && d.live) return ['oLive', 'نسخة Google Play ما تنفع وياها «تعديل فوري» بنفس الوقت'];
     if (m === 'url') {
         const u = normUrl(d.url);
         if (!u) return ['fUrl', 'اكتب رابط صحيح مثل https://example.com'];
@@ -3265,8 +3599,21 @@ $('viewEdit').addEventListener('input', e => {
     if (e.target.id === 'fSrcCode') updateEntryHint();
 });
 $('viewEdit').addEventListener('change', () => { S.dirty = true; });
-$('oLive').addEventListener('change', () => { if ($('oLive').checked && $('oPrivate').checked) { $('oPrivate').checked = false; toast('تم إطفاء «مستودع خاص»، التعديل الفوري يحتاج مستودع عام', 3500); } });
-$('oPrivate').addEventListener('change', () => { if ($('oPrivate').checked && $('oLive').checked) { $('oLive').checked = false; toast('تم إطفاء «تعديل فوري»، المستودع الخاص ما يدعمه', 3500); } });
+$('oLive').addEventListener('change', () => {
+    if ($('oLive').checked && $('oPrivate').checked) { $('oPrivate').checked = false; toast('تم إطفاء «مستودع خاص»، التعديل الفوري يحتاج مستودع عام', 3500); }
+    if ($('oLive').checked && $('oPlay').checked) { $('oPlay').checked = false; toast('تم إطفاء «نسخة Google Play»، ما تنفع وياها التعديل الفوري', 3500); }
+});
+$('oPrivate').addEventListener('change', () => {
+    if ($('oPrivate').checked && $('oLive').checked) { $('oLive').checked = false; toast('تم إطفاء «تعديل فوري»، المستودع الخاص ما يدعمه', 3500); }
+    if (!$('oPrivate').checked && $('oPlay').checked) { $('oPlay').checked = false; toast('تم إطفاء «نسخة Google Play»، لازم تبقى بمستودع خاص لأنها تحتوي مفتاح توقيع سري', 4000); }
+});
+$('oPlay').addEventListener('change', () => {
+    if ($('oPlay').checked) {
+        $('oPrivate').checked = true;
+        if ($('oLive').checked) { $('oLive').checked = false; toast('تم إطفاء «تعديل فوري» وتفعيل «مستودع خاص» — لازمين لنسخة Google Play', 4000); }
+        else toast('تم تفعيل «مستودع خاص» تلقائي — مفتاح النشر لازم يبقى سري', 3500);
+    }
+});
 
 document.querySelectorAll('#langs .lang').forEach(t => {
     t.onclick = () => { readForm(); setMode(t.dataset.mode); S.dirty = true; };
@@ -3510,6 +3857,23 @@ function iconCanvas(app, img, size) {
     x.restore();
     return c;
 }
+function iconForegroundCanvas(app, img, size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const x = c.getContext('2d');
+    const m = size * 0.18;
+    const inner = size - m * 2;
+    if (img) {
+        x.drawImage(img, m, m, inner, inner);
+    } else {
+        x.fillStyle = '#fff';
+        x.font = 'bold ' + Math.round(inner * 0.62) + 'px "Segoe UI", Tahoma, sans-serif';
+        x.textAlign = 'center';
+        x.textBaseline = 'middle';
+        x.fillText(Array.from((app.name || 'P').trim())[0] || 'P', size / 2, size / 2 + size * 0.02);
+    }
+    return c;
+}
 function canvasBytes(c) {
     return new Promise((res, rej) => c.toBlob(b => {
         if (!b) return rej(new Error('تعذر توليد الأيقونة'));
@@ -3525,6 +3889,7 @@ async function buildProjectFiles(app, opts) {
     const sizes = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
     for (const k of Object.keys(sizes)) {
         files.push({ path: 'app/src/main/res/mipmap-' + k + '/ic_launcher.png', data: await canvasBytes(iconCanvas(app, img, sizes[k])) });
+        files.push({ path: 'app/src/main/res/mipmap-' + k + '/ic_launcher_fg.png', data: await canvasBytes(iconForegroundCanvas(app, img, sizes[k])) });
     }
     if (app.mode === 'code') files.push({ path: 'app/src/main/assets/www/index.html', data: enc.encode(app.code) });
     if (app.mode === 'zip') for (const f of app.files) files.push({ path: 'app/src/main/assets/www/' + f.path, data: f.data });
@@ -3572,11 +3937,11 @@ const BUI = {
             BUI.done();
             BUI.log('🎉 الـ APK جاهز');
             S.lastLink = res.isPrivate ? res.releaseUrl : res.apkUrl;
-            const main = res.isPrivate
-                ? '<a class="btn-submit" style="text-decoration:none" href="' + esc(res.releaseUrl) + '" target="_blank" rel="noopener"><span>فتح صفحة التنزيل</span><span>⬇</span></a><div class="hint">المستودع خاص، سجّل دخول GitHub بالمتصفح وبعدها نزّل app.apk.</div>'
-                : '<a class="btn-submit" style="text-decoration:none" href="' + esc(res.apkUrl) + '" target="_blank" rel="noopener"><span>تنزيل APK</span><span>⬇</span></a><div class="hint">بعد التنزيل افتح الملف وثبّته، وإذا طلب منك فعّل «التثبيت من مصادر غير معروفة».</div>';
+            const main = '<button class="btn-submit" type="button" data-act="dl"><span>تنزيل APK</span><span>⬇</span></button><div class="hint">ينزل داخل نفس الصفحة باسم التطبيق، بدون ما يطلعك لـ GitHub. بعد التنزيل افتح الملف وثبّته، وإذا طلب منك فعّل «التثبيت من مصادر غير معروفة».</div>';
             box.innerHTML = main +
-                '<button class="btn-ghost" type="button" data-act="copylink">🔗 نسخ رابط التنزيل (تشاركه مع غيرك)</button>' +
+                (res.aabUrl ? '<button class="btn-ghost" type="button" data-act="dl-aab">🎯 تنزيل AAB (لرفعه على Google Play)</button><div class="hint">راجع ملف README-PLAY-AR.txt داخل المستودع لخطوات النشر المتبقية بكونسول Google Play.</div>' : '') +
+                '<div class="hint">💡 إذا طلع «الحزمة غير صالحة» عند التحديث: احذف النسخة القديمة من الجوال مرة وحدة (لأنها ممكن تكون موقّعة بمفتاح ثاني) وثبّت هذي. بعدها كل التحديثات تنثبت فوق القديمة وبيانات التطبيق تبقى.</div>' +
+                (res.isPrivate ? '' : '<button class="btn-ghost" type="button" data-act="copylink">🔗 نسخ رابط التنزيل (تشاركه مع غيرك)</button>') +
                 '<a class="btn-ghost" href="https://github.com/' + esc(res.owner) + '/' + esc(res.repo) + '" target="_blank" rel="noopener">📁 فتح المستودع على GitHub</a>' +
                 '<button class="btn-ghost" type="button" data-act="home">القائمة الرئيسية</button>';
         } else if (res) {
@@ -3597,6 +3962,8 @@ $('buildResult').addEventListener('click', async e => {
     const b = e.target.closest('[data-act]');
     if (!b) return;
     const act = b.dataset.act;
+    if (act === 'dl') { const a = S.apps.find(x => x.id === S.buildId); if (a) downloadApk(a, b); return; }
+    if (act === 'dl-aab') { const a = S.apps.find(x => x.id === S.buildId); if (a) downloadAab(a, b); return; }
     if (act === 'copylink') return toast((await copyText(S.lastLink)) ? 'اننسخ الرابط 🔗' : 'تعذر النسخ');
     if (act === 'copyerr') return toast((await copyText(S.lastErr)) ? 'اننسخ الخطأ 📋' : 'تعذر النسخ');
     if (S.building) return;
@@ -3620,7 +3987,7 @@ async function finalizeBuild(id, res) {
         a.lastBuild = {
             state: res.success ? 'success' : 'failed', at: Date.now(),
             runId: res.runId, owner: res.owner, repo: res.repo, isPrivate: res.isPrivate,
-            apkUrl: res.apkUrl, releaseUrl: res.releaseUrl, runUrl: res.runUrl, failedStep: res.failedStep
+            apkUrl: res.apkUrl, assetId: res.assetId, aabUrl: res.aabUrl, aabAssetId: res.aabAssetId, releaseUrl: res.releaseUrl, runUrl: res.runUrl, failedStep: res.failedStep
         };
     });
     BUI.result(res);
@@ -3719,6 +4086,52 @@ async function pushLive(id) {
         toast('فشل التحديث الفوري: ' + (e.message || ''), 6000);
     } finally { S.pushing = false; }
 }
+
+/* نشر/تحديث موقع بحث (GitHub Pages) لأوضاع ZIP/كود */
+async function publishSite(id) {
+    const app = S.apps.find(a => a.id === id);
+    if (!app) return;
+    if (['zip', 'code'].indexOf(app.mode) < 0) return toast('نشر الموقع متاح بس لأوضاع ZIP أو HTML');
+    if (S.pushing) return toast('في عملية شغالة هسه، انتظر تخلص');
+    if (!(app.name || '').trim()) { openEditor(app); return toast('اكتب اسم التطبيق أول شي'); }
+    if (app.mode === 'zip' && !(app.files && app.files.length)) { openEditor(app); return toast('ارفع ملف ZIP أول شي'); }
+    if (app.mode === 'code' && !(app.code || '').trim()) { openEditor(app); return toast('اكتب كود HTML أول شي'); }
+    if (!getToken()) { S.pendingSite = id; openGhModal(); return toast('اربط GitHub أول شي، وبعدها ينشر تلقائي', 3500); }
+    S.pushing = true;
+    const btn = $('publishSiteBtn');
+    const prevText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري النشر...'; }
+    toast('جاري نشر الموقع...', 60000);
+    try {
+        const res = await githubPublishSite({ token: getToken(), app, log: () => {} });
+        await patchApp(id, a => { a.site = { owner: res.owner, name: res.repo, url: res.url, publishedAt: Date.now() }; });
+        if (S.draft && S.draft.id === id) { S.draft.site = S.apps.find(a => a.id === id).site; renderSiteInfo(); }
+        toast('تم نشر الموقع 🌐 ' + res.url, 6000);
+    } catch (e) {
+        toast('فشل نشر الموقع: ' + (e.message || ''), 6000);
+    } finally {
+        S.pushing = false;
+        if (btn) { btn.disabled = false; btn.textContent = prevText; }
+    }
+}
+$('publishSiteBtn').onclick = async () => {
+    if (!S.draft) return;
+    if (!(await saveDraft(false))) return;
+    publishSite(S.draft.id);
+};
+
+/* طي/فتح قسم الموقع بضغطة زر */
+function toggleSection(head, body, arrow) {
+    const collapsed = body.style.display === 'none';
+    body.style.display = collapsed ? '' : 'none';
+    arrow.textContent = collapsed ? '▾' : '▸';
+}
+(() => {
+    const head = $('secSiteHead'), body = $('secSiteBody'), arrow = $('secSiteToggle');
+    const go = e => { e.preventDefault(); toggleSection(head, body, arrow); };
+    head.addEventListener('click', go);
+    head.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(e); });
+})();
 
 /* ---------------------------------------------------------------
    التشغيل
