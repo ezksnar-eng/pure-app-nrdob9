@@ -2520,6 +2520,7 @@ function buildTextFiles(app, opts) {
         '    <application',
         '        android:allowBackup="true"',
         '        android:icon="@mipmap/ic_launcher"',
+        '        android:roundIcon="@mipmap/ic_launcher"',
         '        android:label="@string/app_name"',
         '        android:supportsRtl="true"',
         '        android:usesCleartextTraffic="true"',
@@ -2611,7 +2612,6 @@ function buildTextFiles(app, opts) {
         T('app/src/main/res/values/strings.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<resources>', '    <string name="app_name" formatted="false">' + androidStr(app.name) + '</string>', '</resources>', ''].join('\n')),
         T('app/src/main/res/values/styles.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<resources>', '    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">', '        <item name="android:windowBackground">@android:color/white</item>', '    </style>', '</resources>', ''].join('\n')),
         T('app/src/main/res/values-v28/styles.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<resources>', '    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">', '        <item name="android:windowBackground">@android:color/white</item>', '        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>', '    </style>', '</resources>', ''].join('\n')),
-        T('app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml', ['<?xml version="1.0" encoding="utf-8"?>', '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">', '    <background android:drawable="@mipmap/ic_launcher_bg" />', '    <foreground android:drawable="@mipmap/ic_launcher_fg" />', '</adaptive-icon>', ''].join('\n')),
         T('.github/workflows/build-apk.yml', workflowYaml({ python: mode === 'python', playBuild: !!app.playBuild })),
         T('pure-init.gradle', INIT_GRADLE),
         T('README-AR.txt', README_AR)
@@ -3839,6 +3839,8 @@ function iconCanvas(app, img, size) {
     const c = document.createElement('canvas');
     c.width = c.height = size;
     const x = c.getContext('2d');
+    x.imageSmoothingEnabled = true;
+    x.imageSmoothingQuality = 'high';
     const r = size * 0.22;
     x.save();
     x.beginPath();
@@ -3850,7 +3852,8 @@ function iconCanvas(app, img, size) {
     x.closePath();
     x.clip();
     if (img) {
-        x.drawImage(img, 0, 0, size, size);
+        const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, m2 = Math.min(w, h);
+        x.drawImage(img, (w - m2) / 2, (h - m2) / 2, m2, m2, 0, 0, size, size);
     } else {
         const g = x.createLinearGradient(0, 0, size, size);
         g.addColorStop(0, '#ff3d8b');
@@ -3870,11 +3873,13 @@ function iconForegroundCanvas(app, img, size) {
     const c = document.createElement('canvas');
     c.width = c.height = size;
     const x = c.getContext('2d');
+    x.imageSmoothingEnabled = true;
+    x.imageSmoothingQuality = 'high';
     if (img) {
         const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, m2 = Math.min(w, h);
         x.drawImage(img, (w - m2) / 2, (h - m2) / 2, m2, m2, 0, 0, size, size);
     } else {
-        const inner = size * 0.64, m = (size - inner) / 2;
+        const inner = size * 0.64;
         x.fillStyle = '#fff';
         x.font = 'bold ' + Math.round(inner * 0.62) + 'px "Segoe UI", Tahoma, sans-serif';
         x.textAlign = 'center';
@@ -3887,6 +3892,8 @@ function iconAdaptiveBackgroundCanvas(app, img, size) {
     const c = document.createElement('canvas');
     c.width = c.height = size;
     const x = c.getContext('2d');
+    x.imageSmoothingEnabled = true;
+    x.imageSmoothingQuality = 'high';
     if (img) {
         const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, m2 = Math.min(w, h);
         x.drawImage(img, (w - m2) / 2, (h - m2) / 2, m2, m2, 0, 0, size, size);
@@ -3914,8 +3921,6 @@ async function buildProjectFiles(app, opts) {
     const sizes = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
     for (const k of Object.keys(sizes)) {
         files.push({ path: 'app/src/main/res/mipmap-' + k + '/ic_launcher.png', data: await canvasBytes(iconCanvas(app, img, sizes[k])) });
-        files.push({ path: 'app/src/main/res/mipmap-' + k + '/ic_launcher_fg.png', data: await canvasBytes(iconForegroundCanvas(app, img, sizes[k])) });
-        files.push({ path: 'app/src/main/res/mipmap-' + k + '/ic_launcher_bg.png', data: await canvasBytes(iconAdaptiveBackgroundCanvas(app, img, sizes[k])) });
     }
     if (app.mode === 'code') files.push({ path: 'app/src/main/assets/www/index.html', data: enc.encode(app.code) });
     if (app.mode === 'zip') for (const f of app.files) files.push({ path: 'app/src/main/assets/www/' + f.path, data: f.data });
